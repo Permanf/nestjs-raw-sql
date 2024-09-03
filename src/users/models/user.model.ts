@@ -3,7 +3,7 @@ import AddressModel from './address.model';
 
 type UserModelData = {
   id: number;
-  name: number;
+  name: string;
   email: string;
   password: string;
   addressId?: number;
@@ -13,7 +13,7 @@ type UserModelData = {
 };
 class UserModel {
   id: number;
-  name: number;
+  name: string;
   email: string;
   @Exclude()
   password: string;

@@ -6,18 +6,24 @@ import {
     Param,
     Post,
     Put,
+    Query,
+    Req,
+    UseGuards,
   } from '@nestjs/common';
 import PostDto from './dto/post.dto';
 import { PostsService } from './posts.service';
 import FindOneParams from 'src/utils/findOneParams';
+import JwtAuthenticationGuard from 'src/authentication/jwt-authentication.guard';
+import RequestWithUser from 'src/authentication/requestWithUser.interface';
+import GetPostsByAuthorQuery from './query/getPostsByAuthorQuery';
    
   @Controller('posts')
   export default class PostsController {
     constructor(private readonly postsService: PostsService) {}
    
     @Get()
-    getPosts() {
-      return this.postsService.getPosts();
+    getPosts(@Query() { authorId }: GetPostsByAuthorQuery) {
+      return this.postsService.getPosts(authorId);
     }
    
     @Get(':id')
@@ -31,8 +37,10 @@ import FindOneParams from 'src/utils/findOneParams';
     }
    
     @Post()
-    createPost(@Body() postData: PostDto) {
-      return this.postsService.createPost(postData);
+    @UseGuards(JwtAuthenticationGuard)
+    async createPost(@Body() postData: PostDto, @Req() request: RequestWithUser) {
+      console.log(request.user,"---user")
+      // return this.postsService.createPost(postData, request.user.id);
     }
    
     @Delete(':id')

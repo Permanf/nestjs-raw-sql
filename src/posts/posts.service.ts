@@ -7,7 +7,10 @@ import PostDto from './dto/post.dto';
 export class PostsService {
   constructor(private readonly postsRepository: PostsRepository) {}
  
-  getPosts() {
+  getPosts(authorId?: number) {
+    if (authorId) {
+      return this.postsRepository.getByAuthorId(authorId);
+    }
     return this.postsRepository.getAll();
   }
  
@@ -15,8 +18,8 @@ export class PostsService {
     return this.postsRepository.getById(id);
   }
  
-  createPost(postData: PostDto) {
-    return this.postsRepository.create(postData);
+  createPost(postData: PostDto, authorId: number) {
+    return this.postsRepository.create(postData, authorId);
   }
  
   updatePost(id: number, postData: PostDto) {
