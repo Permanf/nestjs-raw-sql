@@ -15,10 +15,13 @@ export class PostsService {
   }
  
   getPostById(id: number) {
-    return this.postsRepository.getById(id);
+    return this.postsRepository.getWithDetails(id);
   }
  
   createPost(postData: PostDto, authorId: number) {
+    if (postData.categoryIds?.length) {
+      return this.postsRepository.createWithCategories(postData, authorId);
+    }
     return this.postsRepository.create(postData, authorId);
   }
  
