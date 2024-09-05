@@ -39,7 +39,6 @@ import GetPostsByAuthorQuery from './query/getPostsByAuthorQuery';
     @Post()
     @UseGuards(JwtAuthenticationGuard)
     async createPost(@Body() postData: PostDto, @Req() request: RequestWithUser) {
-      // console.log(request.user,"---user")
       return this.postsService.createPost(postData, request.user.id);
     }
    

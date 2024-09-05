@@ -21,17 +21,50 @@ class PostsRepository {
     );
   }
 
-  async getByAuthorId(authorId: number) {
+  async getByAuthorId(
+    authorId: number,
+    offset = 0,
+    limit: number | null = null,
+    idsToSkip = 0,
+  ) {
     const databaseResponse = await this.databaseService.runQuery(
       `
-      SELECT * FROM posts WHERE author_id=$1
+      WITH selected_posts AS (
+        SELECT * FROM posts
+        WHERE author_id=$1 AND id > $4
+        ORDER BY id ASC
+        OFFSET $2
+        LIMIT $3
+      ),
+      total_posts_count_response AS (
+        SELECT COUNT(*)::int AS total_posts_count FROM posts
+        WHERE author_id=$1 AND id > $4
+      )
+      SELECT * FROM selected_posts, total_posts_count_response
     `,
-      [authorId],
+      [authorId, offset, limit, idsToSkip],
     );
-    return databaseResponse.rows.map(
+    const items = databaseResponse.rows.map(
       (databaseRow) => new PostModel(databaseRow),
     );
+    const count = databaseResponse.rows[0]?.total_posts_count || 0;
+    return {
+      items,
+      count,
+    };
   }
+  
+  // async getByAuthorId(authorId: number) {
+  //   const databaseResponse = await this.databaseService.runQuery(
+  //     `
+  //     SELECT * FROM posts WHERE author_id=$1
+  //   `,
+  //     [authorId],
+  //   );
+  //   return databaseResponse.rows.map(
+  //     (databaseRow) => new PostModel(databaseRow),
+  //   );
+  // }
 
   async getWithAuthor(postId: number) {
     const databaseResponse = await this.databaseService.runQuery(
@@ -69,7 +102,9 @@ class PostsRepository {
     `,
       [postData.title, postData.content, authorId],
     );
-    return plainToInstance(PostModel, databaseResponse.rows[0]);
+    return databaseResponse.rows.map(
+      (databaseRow) => new PostModel(databaseRow),
+    );
   }
 
   async createWithCategories(postData: PostDto, authorId: number) {
