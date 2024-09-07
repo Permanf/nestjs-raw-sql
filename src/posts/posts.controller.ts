@@ -16,10 +16,13 @@ import FindOneParams from 'src/utils/findOneParams';
 import JwtAuthenticationGuard from 'src/authentication/jwt-authentication.guard';
 import RequestWithUser from 'src/authentication/requestWithUser.interface';
 import GetPostsByAuthorQuery from './query/getPostsByAuthorQuery';
+import { ConfigService } from '@nestjs/config';
    
   @Controller('posts')
   export default class PostsController {
-    constructor(private readonly postsService: PostsService) {}
+    constructor(
+      private readonly postsService: PostsService
+    ) {}
    
     @Get()
     getPosts(@Query() { authorId }: GetPostsByAuthorQuery) {
