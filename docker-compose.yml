@@ -21,11 +21,17 @@ services:
       - docker.env
  
   nestjs-api:
-    image: nestjs-api
+    build:
+      context: .
+      target: install-dependencies
+    command: npm run start:dev
+    volumes:
+      - ./src:/user/src/app/src
     env_file:
       - .env
     ports:
       - "8000:8000"
+      - "9229:9229"
     depends_on:
       - postgres
     networks:
